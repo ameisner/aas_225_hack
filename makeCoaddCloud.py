@@ -129,9 +129,9 @@ def coaddImages(ra, dec, explist, size, destDir):
     return bmiArr
 
 def getExps(dataIds, nIm, inputDir, outPath):
-    exps = {'g':[], 'r':[], 'i':[])
+    exps = {'g':[], 'r':[], 'i':[]}
     for dataId in dataIds:
-        if nIm is None or len(exps[dataId['filter']) < nIm:
+        if nIm is None or len(exps[dataId['filter']]) < nIm:
             fullResult = ProcessSdssCcdTask.parseAndRun(
                 args = [inputDir, "--output", outPath, "--id"] +
                         ["%s=%s"%(key, val) for key, val in dataId.iteritems()],
@@ -146,7 +146,8 @@ def getDataIdsFromRaDec(ra, dec, sqlfile):
     result = conn.execute("select run, field, filter, camcol from fields"+\
                           " where ? between raMin and raMax and"+\
                           " ? between decMin and decMax")
-    return turn result into dataIds
+    raise NotImplementedError("Not finished yet")
+
 
 def main():
     '''Input a position on the sky and set of files (g,r,i) and return a color image'''
