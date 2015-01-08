@@ -156,8 +156,8 @@ def getExps(dataIds, nIm, inputDir, outPath):
 def getDataIdsFromRaDec(ra, dec, sqlfile):
     conn = sqlite3.connect(sqlfile)
     result = conn.execute("select run, field, filter, camcol from fields"+\
-                          " where %.2f between raMin and raMax and"+\
-                          " %.2f between decMin and decMax"%(ra, dec))
+                          " where ? between raMin and raMax and"+\
+                          " ? between decMin and decMax", (ra, dec))
     raise NotImplementedError("Not finished yet")
 
 
