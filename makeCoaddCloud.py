@@ -93,17 +93,25 @@ def warpExposure(destExp, inpExp):
     return omi
 
 
-def coaddImages(ra, dec, explist, size, destDir):
+def coaddImages(ra, dec, expidlist, size, destDir, inputDir):
     '''Given an ra and dec coadd images given in list'''
 
     ra_dec = makeCoord(ra, dec)
     dx = dy = size
+    offPt = afwGeom.Point2I(dx//2, dy//2)
 
 
+    dataId = expidlist[0]
     #define first image as the template
-    bexp = readFile(explist[0])
+    fullResult = ProcessCcdSdssTask.parseAndRun(
+        args = [inputDir, "--output", destDir, "--id"] +
+              ["%s=%s"%(key, val) for key, val in dataId.iteritems()],
+	      doReturnResults = True,
+    )
+    butler = fullResult.parseCmd.butler
+    bexp = butler.get('calexp', dataId)
     bwcs = bexp.getWcs()
-    bbox = makeBbox(bwcs.skyToPixel(ra_dec), dx, dy)
+    bbox = makeBbox(bwcs.skyToPixel(ra_dec)-offPt, dx, dy)
 
     try:
         bexp = bexp.Factory(bexp, bbox, True)
@@ -114,9 +122,14 @@ def coaddImages(ra, dec, explist, size, destDir):
     bmiArr = bexp.getMaskedImage().getImage().getArray()
     bwcs = bexp.getWcs()
     nadded = 0
-    for exp in explist[1:]:
-        file = exp
-        exp = readFile(file)
+    for dataId in expidlist[1:]:
+        fullResult = ProcessCcdSdssTask.parseAndRun(
+           args = [inputDir, "--output", destDir, "--id"] +
+	          ["%s=%s"%(key, val) for key, val in dataId.iteritems()],
+	          doReturnResults = True,
+        )
+	butler = fullResult.parseCmd.butler
+        exp = butler.get('calexp', dataId)
         twcs = exp.getWcs()
         bbox = makeBbox(twcs.skyToPixel(ra_dec), dx, dy)
         try:
@@ -137,13 +150,7 @@ def getExps(dataIds, nIm, inputDir, outPath):
     exps = {'g':[], 'r':[], 'i':[]}
     for dataId in dataIds:
         if nIm is None or len(exps[dataId['filter']]) < nIm:
-            fullResult = ProcessCcdSdssTask.parseAndRun(
-                args = [inputDir, "--output", outPath, "--id"] +
-                        ["%s=%s"%(key, val) for key, val in dataId.iteritems()],
-                doReturnResults = True,
-            )
-            butler = fullResult.parseCmd.butler
-            exps[dataId['filter']].append(butler.get('calexp', dataId))
+            exps[dataId['filter']].append(dataId)
     return exps
 
 def getDataIdsFromRaDec(ra, dec, sqlfile):
