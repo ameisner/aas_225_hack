@@ -186,7 +186,7 @@ def main():
         sqlregistrydir = os.path.join(os.environ["HOME"], "data/runs")
     if not os.path.exists(sqlregistrydir):
         raise RuntimeError("Could not find sql registry directory: %s"%sqlregistrydir)
-    dataIds = getDataIdsFromRaDec(args.ra, args.dec, args.sqlfile)
+    dataIds = getDataIdsFromRaDec(args.ra, args.dec, sqlfile)
     exps = getExps(dataIds, args.nIm, sqlregistrydir, outPath)
     # generate coadded images
     images = []
