@@ -162,7 +162,7 @@ def main():
     args = parser.parse_args()
 
     outPath = tempfile.mkdtemp()
-    dataIds = getDataIdsFromRaDec(ra, dec)
+    dataIds = getDataIdsFromRaDec(args.ra, args.dec)
     exps = getExps(dataIds, args.nIm, inputDir, outPath)
     # generate coadded images
     images = []
