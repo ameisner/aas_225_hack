@@ -97,6 +97,8 @@ def coaddImages(ra, dec, expidlist, size, destDir):
 
     ra_dec = makeCoord(ra, dec)
     dx = dy = size
+    offPt = afwGeom.Point2I(dx//2, dy//2)
+    
 
     dataId = expidlist[0]
     #define first image as the template
@@ -105,10 +107,10 @@ def coaddImages(ra, dec, expidlist, size, destDir):
               ["%s=%s"%(key, val) for key, val in dataId.iteritems()],
 	      doReturnResults = True,
     )
-    butler = fullREsult.parseCmd.butler
+    butler = fullResult.parseCmd.butler
     bexp = butler.get('calexp', dataId)
     bwcs = bexp.getWcs()
-    bbox = makeBbox(bwcs.skyToPixel(ra_dec), dx, dy)
+    bbox = makeBbox(bwcs.skyToPixel(ra_dec)-offPt, dx, dy)
 
     try:
         bexp = bexp.Factory(bexp, bbox, True)
@@ -120,12 +122,12 @@ def coaddImages(ra, dec, expidlist, size, destDir):
     bwcs = bexp.getWcs()
     nadded = 0
     for dataId in expidlist[1:]:
-        fullResult = ProcessSdssCcdTask.parseAndRun(
+        fullResult = ProcessCcdSdssTask.parseAndRun(
            args = [inputDir, "--output", outPath, "--id"] +
 	          ["%s=%s"%(key, val) for key, val in dataId.iteritems()],
 	          doReturnResults = True,
         )
-	butler = fullREsult.parseCmd.butler
+	butler = fullResult.parseCmd.butler
         exp = butler.get('calexp', dataId)
         twcs = exp.getWcs()
         bbox = makeBbox(twcs.skyToPixel(ra_dec), dx, dy)
