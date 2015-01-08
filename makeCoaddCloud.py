@@ -172,7 +172,7 @@ def main():
     parser.add_argument('--size', dest='size', type=int, default=300, help='Size of postage stamp')
     parser.add_argument('--nIm', dest='nIm', type=int, help='Number of images in each band to coadd.  Default is all of them')
     parser.add_argument('--sqlfile', dest='sqlfile', help='specify sqllite database file')
-    parser.add_argument('--sqlregistrydir', dest='registryDir', help='path to directory containing registry file')
+    parser.add_argument('--sqlregistrydir', dest='sqlregistrydir', help='path to directory containing registry file')
     args = parser.parse_args()
 
     outPath = tempfile.mkdtemp()
