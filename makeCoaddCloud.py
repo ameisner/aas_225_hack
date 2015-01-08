@@ -177,7 +177,7 @@ def main():
         sqlfile = os.path.join(os.environ["HOME"], "AAS_Hack_Day/fields.sqlite")
     if not os.path.exists(sqlfile):
         raise RuntimeError("Could not find sql file: %s"%sqlfile)
-    dataIds = getDataIdsFromRaDec(args.ra, args.dec, args.sqlfile)
+    dataIds = getDataIdsFromRaDec(args.ra, args.dec, sqlfile)
     exps = getExps(dataIds, args.nIm, inputDir, outPath)
     # generate coadded images
     images = []
