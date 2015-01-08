@@ -1,3 +1,5 @@
+import os
+
 import lsst.afw.math as afwMath
 import lsst.afw.coord as afwCoord
 import lsst.afw.geom as afwGeom
@@ -45,7 +47,7 @@ def scaleAsinh(imageList, zmin=None, zmax=None, nonLinear = 3.0, scales=[4.9,5.7
     for image in imageList:
         image *= value/total
         maxval = max(maxval, image.max())
-        
+
     scaledImages = []
     for image in imageList:
         image /= maxval
@@ -85,14 +87,14 @@ def makeBbox(idx, dx, dy):
 def warpExposure(destExp, inpExp):
     '''warp exposure to match destExp'''
     warper = afwMath.Warper("lanczos2")
-    omi = warper.warpImage(destExp.getWcs(), inpExp.getMaskedImage(), 
+    omi = warper.warpImage(destExp.getWcs(), inpExp.getMaskedImage(),
                            inpExp.getWcs(), destBBox=destExp.getBBox(afwImage.PARENT))
     return omi
 
 
 def coaddImages(ra, dec, explist, size, destDir):
     '''Given an ra and dec coadd images given in list'''
-    
+
     ra_dec = makeCoord(ra, dec)
     dx = dy = size
 
@@ -132,7 +134,7 @@ def getExps(dataIds, nIm, inputDir, outPath):
     exps = {'g':[], 'r':[], 'i':[]}
     for dataId in dataIds:
         if nIm is None or len(exps[dataId['filter']]) < nIm:
-            fullResult = ProcessSdssCcdTask.parseAndRun(
+            fullResult = ProcessCcdSdssTask.parseAndRun(
                 args = [inputDir, "--output", outPath, "--id"] +
                         ["%s=%s"%(key, val) for key, val in dataId.iteritems()],
                 doReturnResults = True,
@@ -159,16 +161,22 @@ def main():
     parser.add_argument('--destDir', dest="destDir", help='Destination directory.  Current directory by default.', default='.')
     parser.add_argument('--size', dest='size', type=int, default=300, help='Size of postage stamp')
     parser.add_argument('--nIm', dest='nIm', type=int, help='Number of images in each band to coadd.  Default is all of them')
+    parser.add_argument('--sqlfile', dest='sqlfile', help='specify sqllite database file')
     args = parser.parse_args()
 
     outPath = tempfile.mkdtemp()
-    dataIds = getDataIdsFromRaDec(ra, dec)
+    sqlfile = args.sqlfile
+    if not sqlfile:
+        sqlfile = os.path.join(os.environ["HOME"], "AAS_Hack_Day/fields.sqlite")
+    if not os.path.exists(sqlfile):
+        raise RuntimeError("Could not find sql file: %s"%sqlfile)
+    dataIds = getDataIdsFromRaDec(args.ra, args.dec, args.sqlfile)
     exps = getExps(dataIds, args.nIm, inputDir, outPath)
     # generate coadded images
     images = []
     for key, val in exps.iteritems:
         images.append(coaddImages(args.ra, args.dec, val, args.size), args.destDir)
-    
+
     # scale image
 #   scaledImages = scaleLinear(images, zmax=100.)
     scaledImages = scaleAsinh(images, zmax=100.)
