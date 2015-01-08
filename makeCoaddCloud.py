@@ -158,8 +158,14 @@ def getDataIdsFromRaDec(ra, dec, sqlfile):
     result = conn.execute("select run, field, filter, camcol from fields"+\
                           " where ? between raMin and raMax and"+\
                           " ? between decMin and decMax", (ra, dec))
-    raise NotImplementedError("Not finished yet")
-
+    descr = result.description
+    arr = []
+    for res in result:
+        dict = {}
+        for i in range(len(res)):
+            dict[descr[i][0]] = res[i]
+        arr.append(dict)
+    return arr
 
 def main():
     '''Input a position on the sky and set of files (g,r,i) and return a color image'''
