@@ -2,7 +2,7 @@ import lsst.afw.math as afwMath
 import lsst.afw.coord as afwCoord
 import lsst.afw.geom as afwGeom
 import lsst.afw.image as afwImage
-from lsst.obs.sdss import ProcessSdssCcdTask
+from lsst.obs.sdss.processCcdSdss import ProcessCcdSdssTask
 import tempfile
 import numpy, math, cmath
 import argparse
