@@ -1,4 +1,5 @@
 import os
+import sqlite3
 
 import lsst.afw.math as afwMath
 import lsst.afw.coord as afwCoord
@@ -6,7 +7,7 @@ import lsst.afw.geom as afwGeom
 import lsst.afw.image as afwImage
 from lsst.obs.sdss.processCcdSdss import ProcessCcdSdssTask
 import tempfile
-import numpy, math, cmath
+import numpy, math #cmath
 import argparse
 import Image
 
@@ -131,6 +132,8 @@ def coaddImages(ra, dec, explist, size, destDir):
     return bmiArr
 
 def getExps(dataIds, nIm, inputDir, outPath):
+    """inputDir: path to directory containing sql registry file
+    """
     exps = {'g':[], 'r':[], 'i':[]}
     for dataId in dataIds:
         if nIm is None or len(exps[dataId['filter']]) < nIm:
@@ -139,12 +142,12 @@ def getExps(dataIds, nIm, inputDir, outPath):
                         ["%s=%s"%(key, val) for key, val in dataId.iteritems()],
                 doReturnResults = True,
             )
-            butler = fullREsult.parseCmd.butler
+            butler = fullResult.parseCmd.butler
             exps[dataId['filter']].append(butler.get('calexp', dataId))
     return exps
 
 def getDataIdsFromRaDec(ra, dec, sqlfile):
-    conn = sqlite.connect(sqlfile)
+    conn = sqlite3.connect(sqlfile)
     result = conn.execute("select run, field, filter, camcol from fields"+\
                           " where ? between raMin and raMax and"+\
                           " ? between decMin and decMax")
@@ -162,6 +165,7 @@ def main():
     parser.add_argument('--size', dest='size', type=int, default=300, help='Size of postage stamp')
     parser.add_argument('--nIm', dest='nIm', type=int, help='Number of images in each band to coadd.  Default is all of them')
     parser.add_argument('--sqlfile', dest='sqlfile', help='specify sqllite database file')
+    parser.add_argument('--sqlregistrydir', dest='registryDir', help='path to directory containing registry file')
     args = parser.parse_args()
 
     outPath = tempfile.mkdtemp()
@@ -170,8 +174,13 @@ def main():
         sqlfile = os.path.join(os.environ["HOME"], "AAS_Hack_Day/fields.sqlite")
     if not os.path.exists(sqlfile):
         raise RuntimeError("Could not find sql file: %s"%sqlfile)
+    sqlregistrydir = args.sqlregistrydir
+    if not sqlregistrydir:
+        sqlregistrydir = os.path.join(os.environ["HOME"], "data/runs")
+    if not os.path.exists(sqlregistrydir):
+        raise RuntimeError("Could not find sql registry directory: %s"%sqlregistrydir)
     dataIds = getDataIdsFromRaDec(args.ra, args.dec, args.sqlfile)
-    exps = getExps(dataIds, args.nIm, inputDir, outPath)
+    exps = getExps(dataIds, args.nIm, sqlregistrydir, outPath)
     # generate coadded images
     images = []
     for key, val in exps.iteritems:
