@@ -6,7 +6,7 @@ in /home/stackuser/lsstStack
 source loadLSST.bash
 
 also, to access some of the necessary python modules
-setup afv
+setup afw
 setup obs_sdss
 
 
