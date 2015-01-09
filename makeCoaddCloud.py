@@ -1,6 +1,6 @@
 import os
 import sqlite3
-
+import itertools
 import lsst.afw.math as afwMath
 import lsst.afw.coord as afwCoord
 import lsst.afw.geom as afwGeom
@@ -158,12 +158,12 @@ def getDataIdsFromRaDec(ra, dec, sqlfile):
     result = conn.execute("select run, field, filter, camcol from fields"+\
                           " where ? between raMin and raMax and"+\
                           " ? between decMin and decMax", (ra, dec))
-    descr = result.description
+    descr = [ell[0] for ell in result.description]
     arr = []
     for res in result:
         dict = {}
-        for i in range(len(res)):
-            dict[descr[i][0]] = res[i]
+        for key, value in itertools.izip(descr, res):
+            dict[key] = value
         arr.append(dict)
     return arr
 
