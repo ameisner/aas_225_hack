@@ -105,9 +105,9 @@ def coaddImages(ra, dec, expidlist, size, destDir, inputDir):
 
     dataId = expidlist[0]
     #define first image as the template
+    args = [inputDir, "--output", destDir, "--id"] + ["%s=%s"%(key, val) for key, val in dataId.iteritems()]
     fullResult = ProcessCcdSdssTask.parseAndRun(
-        args = [inputDir, "--output", destDir, "--id"] +
-              ["%s=%s"%(key, val) for key, val in dataId.iteritems()],
+        args = args,
 	      doReturnResults = True,
     )
     butler = fullResult.parseCmd.butler
