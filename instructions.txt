@@ -1,0 +1,9 @@
+accessing external servers
+=======================
+need to delete the file: /etc/udev/rules.d/70-persistent-net.rules as described in:
+https://forums.virtualbox.org/viewtopic.php?f=7&t=43090
+
+to use github and generally access other servers, set up an SSH key:
+
+https://help.github.com/articles/generating-ssh-keys
+
