@@ -94,7 +94,9 @@ def warpExposure(destExp, inpExp):
 
 
 def coaddImages(ra, dec, expidlist, size, destDir, inputDir):
-    '''Given an ra and dec coadd images given in list'''
+    '''Given an ra and dec coadd images given in list
+    inputDir: sql registery directory
+    '''
 
     ra_dec = makeCoord(ra, dec)
     dx = dy = size
@@ -197,7 +199,7 @@ def main():
     # generate coadded images
     images = []
     for key, val in exps.iteritems():
-        images.append(coaddImages(args.ra, args.dec, val, args.size), args.destDir)
+        images.append(coaddImages(args.ra, args.dec, val, args.size, args.destDir, sqlregistrydir))
 
     # scale image
 #   scaledImages = scaleLinear(images, zmax=100.)
