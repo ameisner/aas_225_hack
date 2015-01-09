@@ -131,17 +131,17 @@ def coaddImages(ra, dec, expidlist, size, destDir, inputDir):
 	          doReturnResults = True,
         )
 	butler = fullResult.parseCmd.butler
-        exp = butler.get('calexp', dataId)
-        twcs = exp.getWcs()
-        bbox = makeBbox(twcs.skyToPixel(ra_dec), dx, dy)
-        try:
-            texp = exp.Factory(exp, bbox, True)
-        except:
-            print "Failed to create temp exposure from %s, probably because the bounding box is not in the image"%(file)
-            continue
-        nadded += 1
-        wmi = warpExposure(bexp, texp)
-        bmiArr += numpy.nan_to_num(wmi.getImage().getArray())
+    exp = butler.get('calexp', dataId)
+    twcs = exp.getWcs()
+    bbox = makeBbox(twcs.skyToPixel(ra_dec), dx, dy)
+    try:
+        texp = exp.Factory(exp, bbox, True)
+    except:
+        print "Failed to create temp exposure from %s, probably because the bounding box is not in the image"%(file)
+        continue
+    nadded += 1
+    wmi = warpExposure(bexp, texp)
+    bmiArr += numpy.nan_to_num(wmi.getImage().getArray())
 
     print "Number of images added",nadded, bmiArr.max(), bmiArr.min()
     return bmiArr
