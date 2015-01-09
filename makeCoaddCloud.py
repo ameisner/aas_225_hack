@@ -196,8 +196,8 @@ def main():
     exps = getExps(dataIds, args.nIm, sqlregistrydir, outPath)
     # generate coadded images
     images = []
-    for key, val in exps.iteritems:
-        images.append(coaddImages(args.ra, args.dec, val, args.size), args.destDir)
+    for key, val in exps.iteritems():
+        images.append(coaddImages(args.ra, args.dec, val, args.size, args.destDir, sqlregistrydir))
 
     # scale image
 #   scaledImages = scaleLinear(images, zmax=100.)
