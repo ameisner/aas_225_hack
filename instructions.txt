@@ -1,3 +1,15 @@
+setup
+=====
+one of the first things you need to do when starting out is
+
+in /home/stackuser/lsstStack
+source loadLSST.bash
+
+also, to access some of the necessary python modules
+setup afv
+setup obs_sdss
+
+
 accessing external servers
 ==========================
 need to delete the file: /etc/udev/rules.d/70-persistent-net.rules as described in:
