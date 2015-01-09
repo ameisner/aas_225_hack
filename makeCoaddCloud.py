@@ -94,7 +94,9 @@ def warpExposure(destExp, inpExp):
 
 
 def coaddImages(ra, dec, expidlist, size, destDir, inputDir):
-    '''Given an ra and dec coadd images given in list'''
+    '''Given an ra and dec coadd images given in list
+    inputDir: sql registery directory
+    '''
 
     ra_dec = makeCoord(ra, dec)
     dx = dy = size
